@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}CareerCompass - AI-Assisted Skill Gap Analysis & Career Recommendations{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="py-5 my-lg-4">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7 text-center text-lg-start">
+        <div class="hero-badge mb-3">
+          <i class="fa-solid fa-wand-magic-sparkles text-primary"></i>
+          <span>Next-Generation Career Intelligence</span>
+        </div>
+        <h1 class="hero-title mb-4">
+          Bridge the Gap Between <span class="brand-gradient">Your Skills</span> and Your Dream Career.
+        </h1>
+        <p class="lead text-muted mb-4" style="font-size: 1.15rem; line-height: 1.6;">
+          CareerCompass analyzes your current technical profile, pinpoints missing critical skills, and generates personalized AI-driven roadmaps, project blueprints, and certifications to accelerate your tech career.
+        </p>
+
+        <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start mb-4">
+          {% if current_user.is_authenticated %}
+            <a href="{{ url_for('student.dashboard') }}" class="btn btn-primary-grad btn-lg px-4">
+              <i class="fa-solid fa-gauge me-2"></i> Go to Dashboard
+            </a>
+            <a href="{{ url_for('student.gap_analysis') }}" class="btn btn-glass btn-lg px-4">
+              <i class="fa-solid fa-chart-radar me-2"></i> View Skill Gap
+            </a>
+          {% else %}
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary-grad btn-lg px-4">
+              <i class="fa-solid fa-rocket me-2"></i> Analyze My Skills Free
+            </a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-glass btn-lg px-4">
+              <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Sign In
+            </a>
+          {% endif %}
+        </div>
+
+        <!-- Quick Trust Indicators -->
+        <div class="d-flex flex-wrap gap-4 text-muted small justify-content-center justify-content-lg-start pt-2">
+          <div><i class="fa-solid fa-check text-success me-1"></i> 100% Free & Open Source</div>
+          <div><i class="fa-solid fa-check text-success me-1"></i> AI-Powered Recommendations</div>
+          <div><i class="fa-solid fa-check text-success me-1"></i> Resume Auto-Skill Extraction</div>
+        </div>
+      </div>
+
+      <!-- Hero Visual Preview Card -->
+      <div class="col-lg-5">
+        <div class="glass-card p-4 shadow-lg border-primary border-opacity-25 position-relative">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-2 rounded-pill">
+              <i class="fa-solid fa-bullseye me-1"></i> Live Match Simulator
+            </span>
+            <span class="badge bg-success-subtle text-success px-2 py-1">78% Match</span>
+          </div>
+
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="bg-primary text-white rounded-3 p-3 text-center" style="width: 50px; height: 50px;">
+              <i class="fa-solid fa-layer-group fa-lg"></i>
+            </div>
+            <div>
+              <h5 class="mb-0 fw-bold">Full Stack Web Developer</h5>
+              <span class="text-muted small">Software Engineering &bull; High Demand</span>
+            </div>
+          </div>
+
+          <!-- Mini Progress -->
+          <div class="mb-3">
+            <div class="d-flex justify-content-between text-muted small mb-1">
+              <span>Readiness Progress</span>
+              <span class="text-primary fw-bold">78% Completed</span>
+            </div>
+            <div class="progress" style="height: 8px;">
+              <div class="progress-bar bg-primary" role="progressbar" style="width: 78%;" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+
+          <!-- Simulated Skills Breakdown -->
+          <div class="mb-3">
+            <div class="small fw-semibold text-muted mb-2">Acquired Skills:</div>
+            <div class="d-flex flex-wrap gap-1">
+              <span class="skill-tag badge-matched"><i class="fa-solid fa-check me-1"></i> Python</span>
+              <span class="skill-tag badge-matched"><i class="fa-solid fa-check me-1"></i> JavaScript</span>
+              <span class="skill-tag badge-matched"><i class="fa-solid fa-check me-1"></i> HTML5/CSS3</span>
+              <span class="skill-tag badge-matched"><i class="fa-solid fa-check me-1"></i> Flask</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="small fw-semibold text-muted mb-2">Recommended Next Focus:</div>
+            <div class="d-flex flex-wrap gap-1">
+              <span class="skill-tag badge-critical"><i class="fa-solid fa-arrow-trend-up me-1"></i> Docker</span>
+              <span class="skill-tag badge-critical"><i class="fa-solid fa-arrow-trend-up me-1"></i> CI/CD</span>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-top border-secondary border-opacity-25 text-center">
+            <small class="text-muted"><i class="fa-solid fa-bolt text-warning me-1"></i> Generates custom 4-phase weekly roadmap instantly</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Core Value Pillars -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="fw-bold">How <span class="brand-gradient">CareerCompass</span> Works</h2>
+      <p class="text-muted">Four systematic steps to transform your raw skills into high-impact career readiness.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="glass-card glass-card-hover p-4 h-100 text-center">
+          <div class="d-inline-flex align-items-center justify-content-center bg-primary-light text-primary rounded-circle mb-3" style="width: 60px; height: 60px;">
+            <i class="fa-solid fa-id-card-clip fa-xl"></i>
+          </div>
+          <h5 class="fw-bold mb-2">1. Skill Profiler & Resume</h5>
+          <p class="text-muted small">
+            Select your skills or drop your resume PDF to instantly extract and verify your technical competencies.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="glass-card glass-card-hover p-4 h-100 text-center">
+          <div class="d-inline-flex align-items-center justify-content-center bg-danger-subtle text-danger rounded-circle mb-3" style="width: 60px; height: 60px;">
+            <i class="fa-solid fa-chart-radar fa-xl"></i>
+          </div>
+          <h5 class="fw-bold mb-2">2. Skill Gap Analyzer</h5>
+          <p class="text-muted small">
+            Visual radar analysis highlights exactly what critical and recommended skills you need to achieve 100% readiness.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="glass-card glass-card-hover p-4 h-100 text-center">
+          <div class="d-inline-flex align-items-center justify-content-center bg-success-subtle text-success rounded-circle mb-3" style="width: 60px; height: 60px;">
+            <i class="fa-solid fa-route fa-xl"></i>
+          </div>
+          <h5 class="fw-bold mb-2">3. Phased Roadmaps</h5>
+          <p class="text-muted small">
+            Structured step-by-step learning phases with actionable milestone checkboxes and progress persistence.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="glass-card glass-card-hover p-4 h-100 text-center">
+          <div class="d-inline-flex align-items-center justify-content-center bg-info-subtle text-info rounded-circle mb-3" style="width: 60px; height: 60px;">
+            <i class="fa-solid fa-robot fa-xl"></i>
+          </div>
+          <h5 class="fw-bold mb-2">4. AI Career Assistant</h5>
+          <p class="text-muted small">
+            Generate role-specific mock interview questions, portfolio project blueprints, and personalized study schedules.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Career Tracks -->
+<section class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
+      <div>
+        <h2 class="fw-bold mb-1">Featured <span class="brand-gradient">Career Paths ({{ careers|length }})</span></h2>
+        <p class="text-muted mb-0">Explore high-demand tech roles across AI, Web, Cloud, DevOps, Blockchain, and Security.</p>
+      </div>
+      <a href="{{ url_for('main.explore_careers') }}" class="btn btn-glass">
+        View Full Directory ({{ careers|length }}) <i class="fa-solid fa-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="row g-4">
+      {% for career in careers[:9] %}
+        <div class="col-md-6 col-lg-4">
+          <div class="glass-card glass-card-hover p-4 h-100 d-flex flex-column">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-3 p-3" style="width: 48px; height: 48px;">
+                <i class="fa-solid {{ career.icon }} fa-lg"></i>
+              </div>
+              <span class="badge bg-secondary-subtle text-white fw-bold">{{ career.category }}</span>
+            </div>
+
+            <h5 class="fw-bold mb-2 text-white">{{ career.title }}</h5>
+            <p class="text-muted small flex-grow-1 line-clamp-2">{{ career.description }}</p>
+
+            <!-- Skills chips preview -->
+            <div class="mb-3">
+              <div class="d-flex flex-wrap gap-1">
+                {% for req in career.skill_requirements[:3] %}
+                  <span class="skill-tag" style="font-size: 0.75rem; color: #f1f5f9;"><i class="fa-solid fa-code me-1 text-primary"></i> {{ req.skill.name }}</span>
+                {% endfor %}
+                {% if career.skill_requirements|length > 3 %}
+                  <span class="skill-tag text-muted" style="font-size: 0.75rem;">+{{ career.skill_requirements|length - 3 }} more</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center text-muted small mb-3 pt-2 border-top border-secondary border-opacity-25">
+              <span><i class="fa-solid fa-money-bill-wave text-success me-1"></i> <strong class="text-white">{{ career.average_salary }}</strong></span>
+              <span class="badge bg-danger-subtle text-danger"><i class="fa-solid fa-fire me-1"></i> {{ career.market_demand }}</span>
+            </div>
+
+            <div class="d-flex gap-2">
+              <a href="{{ url_for('main.career_detail', career_id=career.id) }}" class="btn btn-glass w-100 text-center py-2">
+                Explore
+              </a>
+              {% if current_user.is_authenticated and not current_user.is_admin %}
+                <form action="{{ url_for('student.set_target_career', career_id=career.id) }}" method="POST" class="w-100">
+                  <button type="submit" class="btn btn-primary-grad w-100 py-2">
+                    Analyze Gap
+                  </button>
+                </form>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action Banner -->
+<section class="py-5 my-4">
+  <div class="container">
+    <div class="glass-card p-5 text-center position-relative overflow-hidden" style="border-color: rgba(37, 99, 235, 0.4);">
+      <h2 class="fw-bold mb-3">Ready to Discover Your Ideal Tech Career?</h2>
+      <p class="text-muted lead mb-4 mx-auto" style="max-width: 600px;">
+        Join CareerCompass today. Map your skills, track milestones, and become job-ready with structured AI guidance.
+      </p>
+      {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary-grad btn-lg px-5 py-3 shadow">
+          <i class="fa-solid fa-sparkles me-2"></i> Start Your Journey Now
+        </a>
+      {% else %}
+        <a href="{{ url_for('student.dashboard') }}" class="btn btn-primary-grad btn-lg px-5 py-3 shadow">
+          <i class="fa-solid fa-gauge me-2"></i> Launch Dashboard
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

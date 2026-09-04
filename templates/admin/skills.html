@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Skills Catalog - Admin - CareerCompass{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+      <h2 class="fw-bold mb-1"><i class="fa-solid fa-code text-success me-2"></i> Skills Catalog Management</h2>
+      <p class="text-muted mb-0">Add and manage the system taxonomy of technical and soft skills.</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Add Skill Form -->
+    <div class="col-lg-4">
+      <div class="glass-card p-4">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-plus-circle text-primary me-2"></i> Add New Skill</h5>
+        <form method="POST" action="{{ url_for('admin.skills_list') }}">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-muted">Skill Name *</label>
+            <input type="text" name="name" class="form-control form-control-custom" placeholder="e.g. GraphQL, Next.js" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-muted">Category *</label>
+            <input type="text" name="category" list="categoryOptions" class="form-control form-control-custom" placeholder="e.g. Frontend, Backend, AI/ML" required>
+            <datalist id="categoryOptions">
+              {% for c in categories %}
+                <option value="{{ c }}">
+              {% endfor %}
+            </datalist>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-muted">Description (Optional)</label>
+            <textarea name="description" rows="3" class="form-control form-control-custom" placeholder="Brief technical definition..."></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary-grad w-100 py-2">
+            <i class="fa-solid fa-floppy-disk me-1"></i> Save Skill
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Skills List Table -->
+    <div class="col-lg-8">
+      <div class="glass-card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">All Registered Skills ({{ skills|length }})</h5>
+          <div class="w-50">
+            <input type="text" id="tableSearchInput" class="form-control form-control-custom form-control-sm" placeholder="Filter skills...">
+          </div>
+        </div>
+
+        <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+          <table class="table table-dark table-hover align-middle mb-0">
+            <thead>
+              <tr class="text-muted small border-secondary border-opacity-25">
+                <th>Skill Name</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in skills %}
+                <tr class="border-secondary border-opacity-10 filterable-row">
+                  <td class="fw-semibold text-white">{{ s.name }}</td>
+                  <td><span class="badge bg-subtle text-muted">{{ s.category }}</span></td>
+                  <td class="small text-muted text-truncate" style="max-width: 250px;">{{ s.description }}</td>
+                  <td class="text-end">
+                    <form action="{{ url_for('admin.skill_delete', skill_id=s.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete skill {{ s.name }}?');">
+                      <button type="submit" class="btn btn-sm btn-link text-danger p-0">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

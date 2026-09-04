@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Career Paths - Admin - CareerCompass{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+      <h2 class="fw-bold mb-1"><i class="fa-solid fa-briefcase text-primary me-2"></i> Manage Career Roles</h2>
+      <p class="text-muted mb-0">Create, update, or remove career roles and configure required skill sets.</p>
+    </div>
+    <a href="{{ url_for('admin.career_create') }}" class="btn btn-primary-grad">
+      <i class="fa-solid fa-plus me-1"></i> Add Career Role
+    </a>
+  </div>
+
+  <div class="glass-card p-4">
+    <div class="table-responsive">
+      <table class="table table-dark table-hover align-middle">
+        <thead>
+          <tr class="text-muted small border-secondary border-opacity-25">
+            <th>Title</th>
+            <th>Category</th>
+            <th>Avg. Salary</th>
+            <th>Market Demand</th>
+            <th>Required Skills</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for career in careers %}
+            <tr class="border-secondary border-opacity-10">
+              <td class="fw-semibold">
+                <i class="fa-solid {{ career.icon }} text-primary me-2"></i> {{ career.title }}
+              </td>
+              <td><span class="badge bg-subtle text-muted">{{ career.category }}</span></td>
+              <td><span class="text-muted small">{{ career.average_salary }}</span></td>
+              <td><span class="badge bg-success-subtle text-success">{{ career.market_demand }}</span></td>
+              <td>
+                <span class="badge bg-primary-subtle text-primary">{{ career.skill_requirements|length }} Skills</span>
+              </td>
+              <td class="text-end">
+                <a href="{{ url_for('admin.career_edit', career_id=career.id) }}" class="btn btn-sm btn-link text-primary p-0 me-3" title="Edit">
+                  <i class="fa-solid fa-pen-to-square"></i> Edit
+                </a>
+                <form action="{{ url_for('admin.career_delete', career_id=career.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this career path?');">
+                  <button type="submit" class="btn btn-sm btn-link text-danger p-0" title="Delete">
+                    <i class="fa-solid fa-trash"></i> Delete
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

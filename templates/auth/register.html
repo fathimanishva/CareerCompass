@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account - CareerCompass{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-auto">
+  <div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+      <div class="glass-card p-4 p-md-5 shadow-lg border-primary border-opacity-25">
+        <div class="text-center mb-4">
+          <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-3 p-3 mb-3 shadow" style="width: 50px; height: 50px;">
+            <i class="fa-solid fa-user-plus fa-xl"></i>
+          </div>
+          <h3 class="fw-bold">Create Free Account</h3>
+          <p class="text-muted small">Start analyzing skill gaps and tracking customized learning paths</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.register') }}">
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold text-muted">Full Name *</label>
+              <div class="input-group">
+                <span class="input-group-text bg-transparent border-secondary border-opacity-25 text-muted"><i class="fa-solid fa-user"></i></span>
+                <input type="text" name="full_name" class="form-control form-control-custom" placeholder="e.g. Alex Morgan" required autofocus>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold text-muted">Email Address *</label>
+              <div class="input-group">
+                <span class="input-group-text bg-transparent border-secondary border-opacity-25 text-muted"><i class="fa-solid fa-envelope"></i></span>
+                <input type="email" name="email" class="form-control form-control-custom" placeholder="name@example.com" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-muted">Education / Degree</label>
+            <div class="input-group">
+              <span class="input-group-text bg-transparent border-secondary border-opacity-25 text-muted"><i class="fa-solid fa-graduation-cap"></i></span>
+              <input type="text" name="education" class="form-control form-control-custom" placeholder="e.g. B.Tech Computer Science / Self-Taught">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-muted">Target Career Goal (Optional)</label>
+            <div class="input-group">
+              <span class="input-group-text bg-transparent border-secondary border-opacity-25 text-muted"><i class="fa-solid fa-bullseye"></i></span>
+              <select name="target_career_id" class="form-select form-control-custom">
+                <option value="">-- Select or decide later --</option>
+                {% for c in careers %}
+                  <option value="{{ c.id }}">{{ c.title }} ({{ c.category }})</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold text-muted">Password *</label>
+              <div class="input-group">
+                <span class="input-group-text bg-transparent border-secondary border-opacity-25 text-muted"><i class="fa-solid fa-lock"></i></span>
+                <input type="password" name="password" class="form-control form-control-custom" placeholder="Min. 6 characters" required>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold text-muted">Confirm Password *</label>
+              <div class="input-group">
+                <span class="input-group-text bg-transparent border-secondary border-opacity-25 text-muted"><i class="fa-solid fa-lock"></i></span>
+                <input type="password" name="confirm_password" class="form-control form-control-custom" placeholder="Re-enter password" required>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary-grad w-100 py-2 fw-bold shadow">
+            <i class="fa-solid fa-sparkles me-2"></i> Register & Set Up Skills
+          </button>
+        </form>
+
+        <div class="mt-4 text-center">
+          <span class="text-muted small">Already have an account?</span>
+          <a href="{{ url_for('auth.login') }}" class="text-primary fw-semibold small ms-1">Sign In</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

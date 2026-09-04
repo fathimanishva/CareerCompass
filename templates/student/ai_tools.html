@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}AI Career Mentor & Mock Interview - CareerCompass{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+      <h2 class="fw-bold mb-1"><i class="fa-solid fa-robot text-info me-2"></i> AI Career Assistant & Interview Prep</h2>
+      <p class="text-muted mb-0">Role-specific intelligence tailored for <strong class="text-primary">{{ target_career.title if target_career else 'Tech Careers' }}</strong>.</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left Column: AI Career Mentor Chat -->
+    <div class="col-lg-6">
+      <div class="glass-card p-4 h-100 d-flex flex-column">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div class="bg-primary text-white rounded-3 p-2">
+            <i class="fa-solid fa-comments"></i>
+          </div>
+          <div>
+            <h5 class="fw-bold mb-0">Ask Career Mentor AI</h5>
+            <span class="text-muted small">Get resume tips, roadmap guidance, or tech stack advice</span>
+          </div>
+        </div>
+
+        <!-- Question Form -->
+        <form method="POST" action="{{ url_for('student.ai_tools') }}" class="mb-4">
+          <div class="mb-3">
+            <textarea name="query" rows="3" class="form-control form-control-custom" placeholder="Ask anything, e.g. 'How should I format my resume for {{ target_career.title if target_career else 'Full Stack' }}?', or 'What system design concepts should I study first?'" required>{{ query_text }}</textarea>
+          </div>
+          <button type="submit" class="btn btn-primary-grad w-100 py-2 fw-bold shadow">
+            <i class="fa-solid fa-paper-plane me-2"></i> Ask Mentor
+          </button>
+        </form>
+
+        <!-- AI Response Box -->
+        {% if ai_response %}
+          <div class="p-4 rounded-3 bg-dark bg-opacity-75 border border-primary border-opacity-30 mt-auto">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i class="fa-solid fa-brain text-primary"></i>
+              <strong class="text-white small">CareerCompass Mentor Response:</strong>
+            </div>
+            <div class="text-muted small" style="line-height: 1.6; white-space: pre-wrap;">{{ ai_response }}</div>
+          </div>
+        {% else %}
+          <div class="p-4 rounded-3 bg-dark bg-opacity-25 border border-secondary border-opacity-10 text-center text-muted small mt-auto">
+            <i class="fa-solid fa-lightbulb text-warning fa-2xl mb-3"></i>
+            <p class="mb-0">Type any question above to receive instant structured mentorship guidance tailored to your profile.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right Column: AI Mock Interview Questions -->
+    <div class="col-lg-6">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div class="d-flex align-items-center gap-2">
+            <div class="bg-success text-white rounded-3 p-2">
+              <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <div>
+              <h5 class="fw-bold mb-0">Role Interview Simulator</h5>
+              <span class="text-muted small">Top 5 Technical & Scenario Questions</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion accordion-flush" id="interviewAccordion">
+          {% for q in interview_questions %}
+            <div class="accordion-item bg-transparent border-secondary border-opacity-25 mb-2 rounded-3 overflow-hidden">
+              <h2 class="accordion-header" id="heading{{ q.id }}">
+                <button class="accordion-button collapsed bg-dark bg-opacity-50 text-white shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ q.id }}">
+                  <span class="badge bg-primary-subtle text-primary me-2">{{ q.type }}</span>
+                  <span class="small fw-semibold">{{ q.question }}</span>
+                </button>
+              </h2>
+              <div id="collapse{{ q.id }}" class="accordion-collapse collapse" data-bs-parent="#interviewAccordion">
+                <div class="accordion-body bg-dark bg-opacity-75 text-muted small">
+                  <div class="mb-2">
+                    <strong class="text-white">Key Concepts to Mention:</strong>
+                    <div class="d-flex flex-wrap gap-1 mt-1">
+                      {% for c in q.key_concepts %}
+                        <span class="badge bg-secondary-subtle text-secondary">{{ c }}</span>
+                      {% endfor %}
+                    </div>
+                  </div>
+                  <div>
+                    <strong class="text-warning">Answer Strategy / Hint:</strong>
+                    <p class="mb-0 mt-1">{{ q.sample_answer_hint }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

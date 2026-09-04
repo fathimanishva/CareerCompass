@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Learning Resources - Admin - CareerCompass{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+      <h2 class="fw-bold mb-1"><i class="fa-solid fa-book-open text-warning me-2"></i> Manage Learning Resources</h2>
+      <p class="text-muted mb-0">Add tutorials, courses, books, and official documentation links.</p>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Add Resource Form -->
+    <div class="col-lg-4">
+      <div class="glass-card p-4">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-plus-circle text-primary me-2"></i> Add Resource</h5>
+        <form method="POST" action="{{ url_for('admin.resources_list') }}">
+          <div class="mb-2">
+            <label class="form-label small text-muted">Title *</label>
+            <input type="text" name="title" class="form-control form-control-custom" placeholder="e.g. Flask Mega-Tutorial" required>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label small text-muted">Resource URL *</label>
+            <input type="url" name="url" class="form-control form-control-custom" placeholder="https://..." required>
+          </div>
+
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label small text-muted">Type</label>
+              <select name="resource_type" class="form-select form-control-custom">
+                <option value="Course">Course</option>
+                <option value="Documentation">Documentation</option>
+                <option value="Interactive">Interactive</option>
+                <option value="Video">Video</option>
+                <option value="Book">Book</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label small text-muted">Provider</label>
+              <input type="text" name="provider" class="form-control form-control-custom" placeholder="e.g. MDN, Coursera">
+            </div>
+          </div>
+
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label small text-muted">Difficulty</label>
+              <select name="difficulty" class="form-select form-control-custom">
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label small text-muted">Map to Career</label>
+              <select name="career_id" class="form-select form-control-custom">
+                <option value="">-- Optional --</option>
+                {% for c in careers %}
+                  <option value="{{ c.id }}">{{ c.title }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" name="is_free" value="true" id="isFreeCheck" checked>
+            <label class="form-check-label text-muted small" for="isFreeCheck">
+              100% Free Resource
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary-grad w-100 py-2">
+            <i class="fa-solid fa-floppy-disk me-1"></i> Save Resource
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Resources List -->
+    <div class="col-lg-8">
+      <div class="glass-card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">Registered Resources ({{ resources|length }})</h5>
+          <div class="w-50">
+            <input type="text" id="tableSearchInput" class="form-control form-control-custom form-control-sm" placeholder="Filter resources...">
+          </div>
+        </div>
+
+        <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+          <table class="table table-dark table-hover align-middle mb-0">
+            <thead>
+              <tr class="text-muted small border-secondary border-opacity-25">
+                <th>Title</th>
+                <th>Type</th>
+                <th>Provider</th>
+                <th>Cost</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in resources %}
+                <tr class="border-secondary border-opacity-10 filterable-row">
+                  <td class="fw-semibold text-white">
+                    <a href="{{ r.url }}" target="_blank" class="text-decoration-none text-white">
+                      {{ r.title }} <i class="fa-solid fa-arrow-up-right-from-square small text-primary ms-1"></i>
+                    </a>
+                  </td>
+                  <td><span class="badge bg-subtle text-muted">{{ r.resource_type }}</span></td>
+                  <td class="small text-muted">{{ r.provider }}</td>
+                  <td>
+                    {% if r.is_free %}
+                      <span class="badge bg-success-subtle text-success">Free</span>
+                    {% else %}
+                      <span class="badge bg-warning-subtle text-warning">Paid</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-end">
+                    <form action="{{ url_for('admin.resource_delete', resource_id=r.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete resource {{ r.title }}?');">
+                      <button type="submit" class="btn btn-sm btn-link text-danger p-0">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

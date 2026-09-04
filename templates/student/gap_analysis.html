@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Skill Gap Analysis - {{ career.title }} - CareerCompass{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Top Career Selector & Action Bar -->
+  <div class="glass-card p-4 mb-4">
+    <div class="row align-items-center g-3">
+      <div class="col-lg-7">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge bg-primary-subtle text-primary">Skill Gap Diagnostic</span>
+          <span class="badge bg-secondary-subtle text-secondary">{{ career.category }}</span>
+        </div>
+        <h2 class="fw-bold mb-1">{{ career.title }}</h2>
+        <p class="text-muted small mb-0">{{ career.description }}</p>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-lg-end">
+          <!-- Switch Target Career Dropdown -->
+          <div class="dropdown">
+            <button class="btn btn-glass dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+              <i class="fa-solid fa-repeat me-1"></i> Switch Career
+            </button>
+            <ul class="dropdown-menu dropdown-menu-dark glass-card border-0 shadow">
+              {% for c in all_careers %}
+                <li>
+                  <a class="dropdown-item py-2 {% if c.id == career.id %}active bg-primary{% endif %}" href="{{ url_for('student.gap_analysis', career_id=c.id) }}">
+                    {{ c.title }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+
+          <a href="{{ url_for('student.roadmap', career_id=career.id) }}" class="btn btn-primary-grad">
+            <i class="fa-solid fa-route me-1"></i> View Phased Roadmap
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overall Match & Radar Chart Row -->
+  <div class="row g-4 mb-4">
+    <!-- Match Score & Readiness Card -->
+    <div class="col-lg-5">
+      <div class="glass-card p-4 h-100 d-flex flex-column justify-content-between">
+        <div>
+          <h5 class="fw-bold mb-3"><i class="fa-solid fa-gauge-high text-primary me-2"></i> Readiness Evaluation</h5>
+          
+          <div class="text-center my-4">
+            <div class="display-3 fw-bold {% if analysis.match_score >= 80 %}text-success{% elif analysis.match_score >= 50 %}text-warning{% else %}text-danger{% endif %} mb-1">
+              {{ analysis.match_score }}%
+            </div>
+            <div class="text-muted small mb-3">Overall Skill Alignment</div>
+            <span class="badge bg-{{ analysis.readiness_badge }}-subtle text-{{ analysis.readiness_badge }} py-2 px-4 rounded-pill fs-6 fw-bold">
+              {{ analysis.readiness_level }}
+            </span>
+          </div>
+
+          <!-- Key Metrics -->
+          <div class="d-flex flex-column gap-2 mb-3">
+            <div class="p-2 rounded-2 bg-dark bg-opacity-50 border border-secondary border-opacity-25 d-flex justify-content-between small">
+              <span class="text-muted"><i class="fa-solid fa-clock text-info me-2"></i> Est. Learning Time:</span>
+              <strong class="text-white">{{ analysis.time_estimate }}</strong>
+            </div>
+            <div class="p-2 rounded-2 bg-dark bg-opacity-50 border border-secondary border-opacity-25 d-flex justify-content-between small">
+              <span class="text-muted"><i class="fa-solid fa-check-circle text-success me-2"></i> Skills Verified:</span>
+              <strong class="text-white">{{ analysis.acquired_count }} / {{ analysis.total_required_count }}</strong>
+            </div>
+            <div class="p-2 rounded-2 bg-dark bg-opacity-50 border border-secondary border-opacity-25 d-flex justify-content-between small">
+              <span class="text-muted"><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i> Missing Critical:</span>
+              <strong class="text-danger">{{ analysis.missing_critical_skills|length }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-3 border-top border-secondary border-opacity-25 d-flex gap-2">
+          <form action="{{ url_for('student.set_target_career', career_id=career.id) }}" method="POST" class="w-100">
+            <button type="submit" class="btn btn-sm btn-glass w-100 py-2">
+              <i class="fa-solid fa-star text-warning me-1"></i> Make Primary Goal
+            </button>
+          </form>
+          <a href="{{ url_for('student.download_report', career_id=career.id) }}" class="btn btn-sm btn-glass text-danger w-100 py-2">
+            <i class="fa-solid fa-file-pdf me-1"></i> Export PDF
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart.js Radar Visualization -->
+    <div class="col-lg-7">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-radar text-primary me-2"></i> Skill Competency Radar</h5>
+          <small class="text-muted">User vs Target Benchmark</small>
+        </div>
+        <div class="radar-container">
+          <canvas id="skillRadarCanvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Skill Breakdown Tables -->
+  <div class="row g-4">
+    <!-- Missing Critical Skills -->
+    <div class="col-lg-6">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0 text-danger"><i class="fa-solid fa-circle-exclamation me-2"></i> Missing Critical Skills</h5>
+          <span class="badge bg-danger-subtle text-danger">{{ analysis.missing_critical_skills|length }} Priority</span>
+        </div>
+        <p class="text-muted small mb-3">These are foundational requirements for {{ career.title }}. Prioritize learning these first.</p>
+
+        {% if analysis.missing_critical_skills %}
+          <div class="d-flex flex-column gap-2">
+            {% for item in analysis.missing_critical_skills %}
+              <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-danger border-opacity-25 d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="fw-bold mb-0 text-white">{{ item.skill.name }}</h6>
+                  <span class="text-muted small">{{ item.skill.category }} &bull; Target: {{ item.target_proficiency }}</span>
+                </div>
+                <a href="{{ url_for('student.resources') }}?skill={{ item.skill.name }}" class="btn btn-sm btn-primary-grad">
+                  Learn <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-4 text-success">
+            <i class="fa-solid fa-circle-check fa-2xl mb-2"></i>
+            <p class="small mb-0">Awesome! You have acquired all critical skills for this role.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Missing Recommended & Optional Skills -->
+    <div class="col-lg-6">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0 text-info"><i class="fa-solid fa-lightbulb me-2"></i> Missing Recommended Skills</h5>
+          <span class="badge bg-info-subtle text-info">{{ analysis.missing_recommended_skills|length }} Secondary</span>
+        </div>
+        <p class="text-muted small mb-3">These skills make you stand out from other candidates and unlock senior opportunities.</p>
+
+        {% if analysis.missing_recommended_skills %}
+          <div class="d-flex flex-column gap-2">
+            {% for item in analysis.missing_recommended_skills %}
+              <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="fw-bold mb-0 text-white">{{ item.skill.name }}</h6>
+                  <span class="text-muted small">{{ item.skill.category }} &bull; Target: {{ item.target_proficiency }}</span>
+                </div>
+                <a href="{{ url_for('student.resources') }}?skill={{ item.skill.name }}" class="btn btn-sm btn-glass">
+                  Tutorials <i class="fa-solid fa-arrow-up-right-from-square ms-1"></i>
+                </a>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-4 text-muted">
+            <p class="small mb-0">No additional recommended skills missing.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Matched Skills Table -->
+  <div class="glass-card p-4 mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-bold mb-0 text-success"><i class="fa-solid fa-circle-check me-2"></i> Verified Acquired Skills ({{ analysis.matched_skills|length }})</h5>
+      <span class="badge bg-success-subtle text-success">Verified</span>
+    </div>
+
+    {% if analysis.matched_skills %}
+      <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0">
+          <thead>
+            <tr class="text-muted small border-secondary border-opacity-25">
+              <th>Skill</th>
+              <th>Category</th>
+              <th>Your Proficiency</th>
+              <th>Required Level</th>
+              <th>Match Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in analysis.matched_skills %}
+              <tr class="border-secondary border-opacity-10">
+                <td class="fw-semibold text-white">
+                  <i class="fa-solid fa-check text-success me-2"></i> {{ item.skill.name }}
+                </td>
+                <td><span class="badge bg-subtle text-muted">{{ item.skill.category }}</span></td>
+                <td><span class="badge bg-primary-subtle text-primary">{{ item.user_proficiency }}</span></td>
+                <td><span class="text-muted small">{{ item.target_proficiency }}</span></td>
+                <td><span class="badge badge-{{ item.importance|badge_color }}">{{ item.importance }}</span></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="text-center py-3 text-muted small">
+        No matching skills detected for this career path yet. Add your current skills to view alignment.
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const chartData = {{ radar_json|safe }};
+  renderSkillRadarChart('skillRadarCanvas', chartData);
+});
+</script>
+{% endblock %}
+{% endblock %}

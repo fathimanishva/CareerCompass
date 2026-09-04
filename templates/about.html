@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}About CareerCompass System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="glass-card p-5 mx-auto" style="max-width: 850px;">
+    <div class="text-center mb-5">
+      <div class="hero-badge mb-2">
+        <i class="fa-solid fa-graduation-cap text-primary"></i> Academic Project
+      </div>
+      <h1 class="fw-bold">About <span class="brand-gradient">CareerCompass</span></h1>
+      <p class="text-muted">AI-Assisted Skill Gap Analysis and Career Recommendation System</p>
+    </div>
+
+    <div class="mb-4">
+      <h4 class="fw-bold text-primary mb-3"><i class="fa-solid fa-circle-info me-2"></i> Project Introduction</h4>
+      <p class="text-muted" style="line-height: 1.7;">
+        In today's competitive job market, students and fresh graduates often face difficulties in identifying the skills required for their desired careers. Many learners spend time studying technologies without a clear learning path, making career preparation challenging.
+      </p>
+      <p class="text-muted" style="line-height: 1.7;">
+        <strong>CareerCompass</strong> is an intelligent web application that analyzes a user's current skills and career goals to provide personalized career guidance. By combining a structured database with AI-assisted recommendations, the system generates phased learning roadmaps, suggests hands-on portfolio projects, certifications, and learning resources.
+      </p>
+    </div>
+
+    <div class="mb-4">
+      <h4 class="fw-bold text-primary mb-3"><i class="fa-solid fa-bullseye me-2"></i> Core Objectives</h4>
+      <ul class="text-muted list-unstyled d-flex flex-column gap-2">
+        <li><i class="fa-solid fa-check text-success me-2"></i> Develop a web-based career guidance and skill analysis system.</li>
+        <li><i class="fa-solid fa-check text-success me-2"></i> Provide secure user registration and role-based authentication (Student / Admin).</li>
+        <li><i class="fa-solid fa-check text-success me-2"></i> Create and manage user skill profiles with automated resume parsing.</li>
+        <li><i class="fa-solid fa-check text-success me-2"></i> Identify skill gaps between current skills and target careers with Radar visualizations.</li>
+        <li><i class="fa-solid fa-check text-success me-2"></i> Generate AI-assisted learning roadmaps and career recommendations.</li>
+        <li><i class="fa-solid fa-check text-success me-2"></i> Recommend relevant projects, certifications, and learning resources.</li>
+        <li><i class="fa-solid fa-check text-success me-2"></i> Allow users to track interactive learning milestones and progress.</li>
+        <li><i class="fa-solid fa-check text-success me-2"></i> Develop an admin module to manage career roles, learning resources, and user information.</li>
+      </ul>
+    </div>
+
+    <div class="mb-4">
+      <h4 class="fw-bold text-primary mb-3"><i class="fa-solid fa-microchip me-2"></i> Technologies Used</h4>
+      <div class="d-flex flex-wrap gap-2">
+        <span class="skill-tag badge-matched">Python 3 (Flask)</span>
+        <span class="skill-tag badge-matched">SQLite Database</span>
+        <span class="skill-tag badge-matched">SQLAlchemy ORM</span>
+        <span class="skill-tag badge-matched">Bootstrap 5.3</span>
+        <span class="skill-tag badge-matched">Chart.js (Radar Charts)</span>
+        <span class="skill-tag badge-matched">Google Gemini / AI NLP Engine</span>
+        <span class="skill-tag badge-matched">PyPDF (Resume Extractor)</span>
+      </div>
+    </div>
+
+    <div class="pt-4 border-top border-secondary border-opacity-25 text-center text-muted small">
+      <div>Project by: <strong>Fathima Nishva A</strong> (Roll No: 19)</div>
+      <div>CareerCompass: AI-Assisted Skill Gap Analysis and Career Recommendation System</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

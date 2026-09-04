@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Personalized Learning Roadmap - {{ career.title }} - CareerCompass{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Top Roadmap Header Banner -->
+  <div class="glass-card p-4 p-md-5 mb-4 position-relative">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-8">
+        <div class="hero-badge mb-2">
+          <i class="fa-solid fa-route text-primary"></i> Phased Milestone Roadmap
+        </div>
+        <h2 class="fw-bold mb-2">{{ career.title }}</h2>
+        <p class="text-muted mb-3">{{ plan.summary }}</p>
+
+        <div class="d-flex flex-wrap gap-3 text-muted small">
+          <div><i class="fa-solid fa-calendar-week text-info me-1"></i> <strong>Timeline:</strong> {{ plan.estimated_weeks }} Weeks</div>
+          <div><i class="fa-solid fa-list-check text-primary me-1"></i> <strong>Milestones:</strong> <span id="completedMilestonesCount">{{ completed_count }}</span> / {{ total_milestones }} Completed</div>
+          <div><i class="fa-solid fa-chart-pie text-success me-1"></i> <strong>Gap Match:</strong> {{ gap_analysis.match_score }}%</div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 text-lg-end">
+        <!-- Interactive Progress Gauge -->
+        <div class="p-3 rounded-4 bg-dark bg-opacity-50 border border-secondary border-opacity-25 d-inline-block text-center w-100">
+          <div class="text-muted small mb-1">Roadmap Progress</div>
+          <div id="roadmapProgressPct" class="display-5 fw-bold text-primary mb-2">
+            {{ progress_pct }}%
+          </div>
+          <div class="progress" style="height: 10px;">
+            <div id="roadmapProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: {{ progress_pct }}%;" aria-valuenow="{{ progress_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+          <div class="text-muted small mt-2">Check off milestones as you learn</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Phased Milestones Timeline Column -->
+    <div class="col-lg-8">
+      {% for phase in plan.phases %}
+        <div class="glass-card p-4 mb-4 roadmap-phase-card">
+          <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+            <div>
+              <span class="badge bg-primary-subtle text-primary mb-1">{{ phase.duration }}</span>
+              <h4 class="fw-bold mb-0 text-white">{{ phase.phase_title }}</h4>
+            </div>
+            <div class="d-flex flex-wrap gap-1">
+              {% for fskill in phase.focus_skills %}
+                <span class="skill-tag badge-recommended" style="font-size: 0.8rem;">{{ fskill }}</span>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Milestones Checklist -->
+          <div class="mb-4">
+            <h6 class="text-muted small fw-bold text-uppercase mb-2">Actionable Milestones:</h6>
+            <div class="d-flex flex-column gap-1">
+              {% for milestone in phase.milestones %}
+                <label class="milestone-item {% if milestone in completed_milestones %}completed{% endif %}">
+                  <input type="checkbox" class="milestone-checkbox" data-career-id="{{ career.id }}" data-milestone="{{ milestone }}" {% if milestone in completed_milestones %}checked{% endif %}>
+                  <span class="milestone-text small fw-medium">{{ milestone }}</span>
+                </label>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Recommended Hands-on Practice -->
+          {% if phase.recommended_practice %}
+            <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+              <div class="small fw-semibold text-warning mb-1">
+                <i class="fa-solid fa-code me-1"></i> Recommended Hands-On Exercise:
+              </div>
+              <p class="text-muted small mb-0">{{ phase.recommended_practice }}</p>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Right Sidebar: Pro Tips & Quick Links -->
+    <div class="col-lg-4">
+      <!-- Expert Pro-Tips -->
+      <div class="glass-card p-4 mb-4">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-lightbulb text-warning me-2"></i> Expert Career Tips</h5>
+        <ul class="text-muted small d-flex flex-column gap-2 mb-0 ps-3">
+          {% for tip in plan.pro_tips %}
+            <li>{{ tip }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Quick Action Cards -->
+      <div class="glass-card p-4 mb-4">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-bolt text-primary me-2"></i> Recommended Hubs</h5>
+        <div class="d-flex flex-column gap-2">
+          <a href="{{ url_for('student.projects') }}" class="btn btn-glass text-start py-2">
+            <i class="fa-solid fa-laptop-code text-success me-2"></i> Browse Portfolio Projects
+          </a>
+          <a href="{{ url_for('student.certifications') }}" class="btn btn-glass text-start py-2">
+            <i class="fa-solid fa-award text-warning me-2"></i> Industry Certifications
+          </a>
+          <a href="{{ url_for('student.ai_tools') }}" class="btn btn-glass text-start py-2">
+            <i class="fa-solid fa-robot text-info me-2"></i> AI Interview Practice
+          </a>
+          <a href="{{ url_for('student.download_report', career_id=career.id) }}" class="btn btn-glass text-start py-2 text-danger">
+            <i class="fa-solid fa-file-pdf me-2"></i> Download Full Assessment PDF
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

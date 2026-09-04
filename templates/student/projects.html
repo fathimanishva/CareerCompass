@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Guided Portfolio Projects - CareerCompass{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+      <h2 class="fw-bold mb-1"><i class="fa-solid fa-laptop-code text-success me-2"></i> Guided Portfolio Projects</h2>
+      <p class="text-muted mb-0">Production-grade project blueprints designed to demonstrate real engineering proficiency.</p>
+    </div>
+
+    <!-- Difficulty Filter -->
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('student.projects') }}" class="btn btn-sm {% if not selected_difficulty %}btn-primary-grad{% else %}btn-glass{% endif %}">
+        All Difficulties
+      </a>
+      <a href="{{ url_for('student.projects', difficulty='Intermediate') }}" class="btn btn-sm {% if selected_difficulty == 'Intermediate' %}btn-primary-grad{% else %}btn-glass{% endif %}">
+        Intermediate
+      </a>
+      <a href="{{ url_for('student.projects', difficulty='Capstone') }}" class="btn btn-sm {% if selected_difficulty == 'Capstone' %}btn-primary-grad{% else %}btn-glass{% endif %}">
+        Capstone
+      </a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    {% for proj in projects %}
+      <div class="col-lg-6">
+        <div class="glass-card p-4 h-100 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge bg-secondary-subtle text-secondary">{{ proj.career.title }}</span>
+            <span class="badge {% if proj.difficulty == 'Capstone' %}bg-danger-subtle text-danger{% else %}bg-warning-subtle text-warning{% endif %}">
+              {{ proj.difficulty }} Project
+            </span>
+          </div>
+
+          <h5 class="fw-bold mb-2">{{ proj.title }}</h5>
+          <p class="text-muted small mb-3">{{ proj.description }}</p>
+
+          <div class="p-2 rounded-2 bg-dark bg-opacity-50 border border-secondary border-opacity-25 small mb-3">
+            <span class="text-muted"><i class="fa-solid fa-code text-primary me-1"></i> <strong>Tech Stack:</strong></span>
+            <span class="text-white">{{ proj.tech_stack }}</span>
+          </div>
+
+          <!-- Milestones Checklist -->
+          <div class="mt-auto">
+            <h6 class="text-muted small fw-bold mb-2">Step-by-Step Implementation Milestones:</h6>
+            <ul class="text-muted small ps-3 mb-0 d-flex flex-column gap-1">
+              {% for m in proj.get_milestones() %}
+                <li>{{ m }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

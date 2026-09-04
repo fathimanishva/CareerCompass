@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Administrator Dashboard - CareerCompass{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+      <div class="hero-badge mb-2">
+        <i class="fa-solid fa-shield-halved text-warning"></i> Administrator Control Center
+      </div>
+      <h2 class="fw-bold mb-0">Platform Overview & Metrics</h2>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('admin.career_create') }}" class="btn btn-primary-grad">
+        <i class="fa-solid fa-plus me-1"></i> Add New Career Role
+      </a>
+    </div>
+  </div>
+
+  <!-- Metric Cards -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-6 col-lg-3">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-muted small fw-semibold">Total Students</span>
+          <div class="rounded-3 bg-primary-light text-primary p-2">
+            <i class="fa-solid fa-user-graduate"></i>
+          </div>
+        </div>
+        <h3 class="fw-bold mb-1">{{ total_students }}</h3>
+        <span class="small text-muted">Registered learners</span>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-muted small fw-semibold">Career Roles</span>
+          <div class="rounded-3 bg-success-subtle text-success p-2">
+            <i class="fa-solid fa-briefcase"></i>
+          </div>
+        </div>
+        <h3 class="fw-bold mb-1">{{ total_careers }}</h3>
+        <span class="small text-muted">Active job profiles</span>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-muted small fw-semibold">Skills in Catalog</span>
+          <div class="rounded-3 bg-info-subtle text-info p-2">
+            <i class="fa-solid fa-code"></i>
+          </div>
+        </div>
+        <h3 class="fw-bold mb-1">{{ total_skills }}</h3>
+        <span class="small text-muted">Categorized technologies</span>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-muted small fw-semibold">Learning Resources</span>
+          <div class="rounded-3 bg-warning-subtle text-warning p-2">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+        </div>
+        <h3 class="fw-bold mb-1">{{ total_resources }}</h3>
+        <span class="small text-muted">Courses & tutorials</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Career Popularity Table -->
+    <div class="col-lg-7">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0"><i class="fa-solid fa-chart-pie text-primary me-2"></i> Career Goal Distribution</h5>
+          <a href="{{ url_for('admin.careers_list') }}" class="small text-primary text-decoration-none">Manage All &rarr;</a>
+        </div>
+        <p class="text-muted small mb-3">Student interest per career path:</p>
+
+        <div class="table-responsive">
+          <table class="table table-dark table-hover align-middle mb-0">
+            <thead>
+              <tr class="text-muted small border-secondary border-opacity-25">
+                <th>Career Title</th>
+                <th>Category</th>
+                <th class="text-center">Students Enrolled</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for stat in career_stats %}
+                <tr class="border-secondary border-opacity-10">
+                  <td class="fw-semibold">
+                    <i class="fa-solid {{ stat.career.icon }} text-primary me-2"></i> {{ stat.career.title }}
+                  </td>
+                  <td><span class="badge bg-subtle text-muted">{{ stat.career.category }}</span></td>
+                  <td class="text-center">
+                    <span class="badge bg-primary-subtle text-primary">{{ stat.user_count }} Students</span>
+                  </td>
+                  <td class="text-end">
+                    <a href="{{ url_for('admin.career_edit', career_id=stat.career.id) }}" class="btn btn-sm btn-link text-primary p-0 me-2" title="Edit">
+                      <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Registered Users -->
+    <div class="col-lg-5">
+      <div class="glass-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0"><i class="fa-solid fa-users text-success me-2"></i> Recent Registrations</h5>
+          <a href="{{ url_for('admin.users_list') }}" class="small text-primary text-decoration-none">View All &rarr;</a>
+        </div>
+
+        <div class="d-flex flex-column gap-3">
+          {% for u in recent_users %}
+            <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-bold small">{{ u.full_name }}</div>
+                <div class="text-muted small">{{ u.email }}</div>
+              </div>
+              <span class="badge {% if u.is_admin %}bg-warning-subtle text-warning{% else %}bg-primary-subtle text-primary{% endif %}">
+                {{ u.role|capitalize }}
+              </span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

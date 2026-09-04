@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}{% if career %}Edit Career: {{ career.title }}{% else %}Create New Career Role{% endif %} - CareerCompass{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="glass-card p-4 p-md-5 mx-auto" style="max-width: 900px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="fw-bold mb-0">
+        {% if career %}<i class="fa-solid fa-pen-to-square text-primary me-2"></i> Edit Career: {{ career.title }}{% else %}<i class="fa-solid fa-plus-circle text-success me-2"></i> Create Career Role{% endif %}
+      </h3>
+      <a href="{{ url_for('admin.careers_list') }}" class="btn btn-sm btn-glass">
+        <i class="fa-solid fa-arrow-left me-1"></i> Back to Careers
+      </a>
+    </div>
+
+    <form method="POST">
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold text-muted">Career Title *</label>
+          <input type="text" name="title" class="form-control form-control-custom" value="{{ career.title if career else '' }}" placeholder="e.g. AI Prompt Engineer" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold text-muted">Category *</label>
+          <input type="text" name="category" class="form-control form-control-custom" value="{{ career.category if career else '' }}" placeholder="e.g. AI & Data Science" required>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label small fw-semibold text-muted">Description *</label>
+        <textarea name="description" rows="3" class="form-control form-control-custom" placeholder="Provide an overview of the role, daily responsibilities, and industry impact..." required>{{ career.description if career else '' }}</textarea>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold text-muted">Average Salary Range</label>
+          <input type="text" name="average_salary" class="form-control form-control-custom" value="{{ career.average_salary if career else '$90,000 - $140,000 / yr' }}">
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold text-muted">Market Demand</label>
+          <select name="market_demand" class="form-select form-control-custom">
+            <option value="Very High" {% if career and career.market_demand == 'Very High' %}selected{% endif %}>Very High</option>
+            <option value="High" {% if career and career.market_demand == 'High' %}selected{% endif %}>High</option>
+            <option value="Moderate" {% if career and career.market_demand == 'Moderate' %}selected{% endif %}>Moderate</option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold text-muted">FontAwesome Icon Class</label>
+          <input type="text" name="icon" class="form-control form-control-custom" value="{{ career.icon if career else 'fa-laptop-code' }}" placeholder="fa-laptop-code">
+        </div>
+      </div>
+
+      <!-- Skill Requirements Configuration -->
+      <div class="mb-4">
+        <h5 class="fw-bold mb-2"><i class="fa-solid fa-layer-group text-primary me-2"></i> Configure Required Skills</h5>
+        <p class="text-muted small mb-3">Select skills and define their importance (Critical vs Recommended) and required target proficiency:</p>
+
+        <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25" style="max-height: 350px; overflow-y: auto;">
+          <div class="row g-3">
+            {% for skill in all_skills %}
+              {% set is_selected = existing_reqs and skill.id in existing_reqs %}
+              <div class="col-md-6">
+                <div class="p-2 rounded-2 bg-dark bg-opacity-75 border border-secondary border-opacity-10 d-flex align-items-center gap-2">
+                  <input class="form-check-input" type="checkbox" name="skill_ids" value="{{ skill.id }}" id="skill_{{ skill.id }}" {% if is_selected %}checked{% endif %}>
+                  <label class="form-check-label text-truncate small fw-semibold flex-grow-1" for="skill_{{ skill.id }}">
+                    {{ skill.name }} <span class="text-muted">({{ skill.category }})</span>
+                  </label>
+
+                  <!-- Importance -->
+                  <select name="importance_{{ skill.id }}" class="form-select form-select-sm form-control-custom" style="width: 110px;">
+                    <option value="Critical" {% if is_selected and existing_reqs[skill.id].importance == 'Critical' %}selected{% endif %}>Critical</option>
+                    <option value="Recommended" {% if is_selected and existing_reqs[skill.id].importance == 'Recommended' %}selected{% endif %}>Recommended</option>
+                    <option value="Optional" {% if is_selected and existing_reqs[skill.id].importance == 'Optional' %}selected{% endif %}>Optional</option>
+                  </select>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary-grad w-100 py-3 fw-bold shadow">
+        <i class="fa-solid fa-floppy-disk me-2"></i> Save Career Role
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

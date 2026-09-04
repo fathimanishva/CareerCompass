@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}CareerCompass - AI-Assisted Skill Gap Analysis & Career Guidance{% endblock %}</title>
+
+  <!-- SEO & Meta -->
+  <meta name="description"
+    content="Personalized AI-powered career roadmaps, skill gap analysis, curated projects, and certifications.">
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- FontAwesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+  <!-- Ambient background glow effects -->
+  <div class="bg-glow">
+    <div class="glow-circle-1"></div>
+    <div class="glow-circle-2"></div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+    <div class="container-fluid px-lg-5">
+      <a class="navbar-brand" href="{{ url_for('main.index') }}">
+        <div
+          class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-3 p-2 shadow-sm"
+          style="width: 38px; height: 38px;">
+          <i class="fa-solid fa-compass fa-lg"></i>
+        </div>
+        <span>Career<span class="brand-gradient">Compass</span></span>
+      </a>
+
+      <button class="navbar-toggler border-0 shadow-none text-white" type="button" data-bs-toggle="collapse"
+        data-bs-target="#navbarMain">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarMain">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}"
+              href="{{ url_for('main.index') }}">
+              <i class="fa-solid fa-house me-1"></i> Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint and ('main.explore_careers' in request.endpoint or 'main.career_detail' in request.endpoint) %}active{% endif %}"
+              href="{{ url_for('main.explore_careers') }}">
+              <i class="fa-solid fa-briefcase me-1"></i> Career Paths
+            </a>
+          </li>
+
+          {% if current_user.is_authenticated %}
+          {% if current_user.is_admin %}
+          <!-- Admin Navigation Links -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle text-warning" href="#" data-bs-toggle="dropdown">
+              <i class="fa-solid fa-shield-halved me-1"></i> Admin Portal
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark glass-card border-0 shadow">
+              <li><a class="dropdown-item py-2" href="{{ url_for('admin.dashboard') }}"><i
+                    class="fa-solid fa-chart-line me-2 text-primary"></i> Admin Overview</a></li>
+              <li><a class="dropdown-item py-2" href="{{ url_for('admin.careers_list') }}"><i
+                    class="fa-solid fa-briefcase me-2 text-info"></i> Manage Careers</a></li>
+              <li><a class="dropdown-item py-2" href="{{ url_for('admin.skills_list') }}"><i
+                    class="fa-solid fa-code me-2 text-success"></i> Manage Skills</a></li>
+              <li><a class="dropdown-item py-2" href="{{ url_for('admin.resources_list') }}"><i
+                    class="fa-solid fa-book-open me-2 text-warning"></i> Manage Resources</a></li>
+              <li><a class="dropdown-item py-2" href="{{ url_for('admin.users_list') }}"><i
+                    class="fa-solid fa-users me-2 text-danger"></i> User Oversight</a></li>
+            </ul>
+          </li>
+          {% else %}
+          <!-- Student Navigation Links -->
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'student.dashboard' %}active{% endif %}"
+              href="{{ url_for('student.dashboard') }}">
+              <i class="fa-solid fa-chart-pie me-1"></i> Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'student.skill_profile' %}active{% endif %}"
+              href="{{ url_for('student.skill_profile') }}">
+              <i class="fa-solid fa-layer-group me-1"></i> My Skills
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint and 'student.gap_analysis' in request.endpoint %}active{% endif %}"
+              href="{{ url_for('student.gap_analysis') }}">
+              <i class="fa-solid fa-chart-radar me-1"></i> Gap Analysis
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint and 'student.roadmap' in request.endpoint %}active{% endif %}"
+              href="{{ url_for('student.roadmap') }}">
+              <i class="fa-solid fa-route me-1"></i> Roadmap
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint == 'student.career_matcher' %}active{% endif %}"
+              href="{{ url_for('student.career_matcher') }}">
+              <i class="fa-solid fa-wand-magic-sparkles me-1"></i> AI Matcher
+            </a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+              <i class="fa-solid fa-lightbulb me-1"></i> Learning Hub
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark glass-card border-0 shadow">
+              <li><a class="dropdown-item py-2" href="{{ url_for('student.resources') }}"><i
+                    class="fa-solid fa-graduation-cap me-2 text-primary"></i> Learning Resources</a></li>
+              <li><a class="dropdown-item py-2" href="{{ url_for('student.projects') }}"><i
+                    class="fa-solid fa-laptop-code me-2 text-success"></i> Guided Projects</a></li>
+              <li><a class="dropdown-item py-2" href="{{ url_for('student.certifications') }}"><i
+                    class="fa-solid fa-award me-2 text-warning"></i> Certifications</a></li>
+              <li>
+                <hr class="dropdown-divider border-secondary opacity-25">
+              </li>
+              <li><a class="dropdown-item py-2" href="{{ url_for('student.ai_tools') }}"><i
+                    class="fa-solid fa-robot me-2 text-info"></i> AI Interview & Mentor</a></li>
+            </ul>
+          </li>
+          {% endif %}
+          {% endif %}
+        </ul>
+
+        <div class="d-flex align-items-center gap-3">
+          <!-- Theme Toggle Button -->
+          <button id="themeToggleBtn" class="btn btn-glass p-2 px-3" title="Toggle Theme"
+            aria-label="Toggle Dark/Light Mode">
+            <i id="themeIcon" class="fa-solid fa-sun text-warning"></i>
+          </button>
+
+          {% if current_user.is_authenticated %}
+          <div class="dropdown">
+            <button class="btn btn-glass dropdown-toggle d-flex align-items-center gap-2" type="button"
+              data-bs-toggle="dropdown">
+              <div
+                class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center font-monospace fw-bold"
+                style="width: 32px; height: 32px; font-size: 0.85rem;">
+                {{ current_user.full_name[:2].upper() }}
+              </div>
+              <span class="d-none d-md-inline font-weight-medium">{{ current_user.full_name.split()[0] }}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark glass-card border-0 shadow">
+              <li class="px-3 py-2 border-bottom border-secondary border-opacity-25">
+                <div class="fw-bold">{{ current_user.full_name }}</div>
+                <div class="small text-muted">{{ current_user.email }}</div>
+                <span class="badge bg-primary-subtle text-primary mt-1">{{ current_user.role|capitalize }}</span>
+              </li>
+              {% if not current_user.is_admin %}
+              <li><a class="dropdown-item py-2" href="{{ url_for('student.dashboard') }}"><i
+                    class="fa-solid fa-gauge me-2"></i> Dashboard</a></li>
+              <li><a class="dropdown-item py-2" href="{{ url_for('student.download_report') }}"><i
+                    class="fa-solid fa-file-arrow-down me-2 text-danger"></i> Export Report (PDF)</a></li>
+              {% else %}
+              <li><a class="dropdown-item py-2" href="{{ url_for('admin.dashboard') }}"><i
+                    class="fa-solid fa-shield-halved me-2"></i> Admin Panel</a></li>
+              {% endif %}
+              <li>
+                <hr class="dropdown-divider border-secondary opacity-25">
+              </li>
+              <li><a class="dropdown-item py-2 text-danger" href="{{ url_for('auth.logout') }}"><i
+                    class="fa-solid fa-right-from-bracket me-2"></i> Logout</a></li>
+            </ul>
+          </div>
+          {% else %}
+          <a href="{{ url_for('auth.login') }}" class="btn btn-glass">
+            <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Log In
+          </a>
+          <a href="{{ url_for('auth.register') }}" class="btn btn-primary-grad">
+            <i class="fa-solid fa-user-plus me-1"></i> Get Started
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Flash Messages -->
+  <div class="container my-3">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div
+      class="alert alert-{{ category }} alert-dismissible fade show glass-card border-0 shadow-sm d-flex align-items-center gap-2"
+      role="alert">
+      <i
+        class="fa-solid {% if category == 'success' %}fa-circle-check text-success{% elif category == 'danger' %}fa-circle-exclamation text-danger{% else %}fa-circle-info text-info{% endif %} fs-5"></i>
+      <div>{{ message }}</div>
+      <button type="button" class="btn-close ms-auto shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Main Content Body -->
+  <main class="flex-grow-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container py-4">
+      <div class="row g-4 align-items-center">
+        <div class="col-md-6">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-3 p-2"
+              style="width: 32px; height: 32px;">
+              <i class="fa-solid fa-compass"></i>
+            </div>
+            <h5 class="mb-0 fw-bold">Career<span class="brand-gradient">Compass</span></h5>
+          </div>
+          <p class="text-muted small mb-0">
+            AI-Assisted Skill Gap Analysis & Career Recommendation System. Empowering students and fresh graduates with
+            structured learning roadmaps.
+          </p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <div class="small text-muted mb-2">Developed by <strong>Fathima Nishva A</strong></div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5.3 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <!-- Custom JS -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+
+</html>

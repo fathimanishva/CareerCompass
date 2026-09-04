@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}User Management - Admin - CareerCompass{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+      <h2 class="fw-bold mb-1"><i class="fa-solid fa-users text-danger me-2"></i> User Oversight & Roles</h2>
+      <p class="text-muted mb-0">View registered students, activity logs, and manage administrator access.</p>
+    </div>
+    <span class="badge bg-primary-subtle text-primary fs-6">{{ users|length }} Total Accounts</span>
+  </div>
+
+  <div class="glass-card p-4">
+    <div class="table-responsive">
+      <table class="table table-dark table-hover align-middle mb-0">
+        <thead>
+          <tr class="text-muted small border-secondary border-opacity-25">
+            <th>User</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Target Career Goal</th>
+            <th>Skills Logged</th>
+            <th>Joined Date</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+            <tr class="border-secondary border-opacity-10">
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                    {{ u.full_name[:2].upper() }}
+                  </div>
+                  <div>
+                    <div class="fw-semibold text-white">{{ u.full_name }}</div>
+                    <div class="small text-muted">{{ u.education or 'Not specified' }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="text-muted small">{{ u.email }}</td>
+              <td>
+                <span class="badge {% if u.is_admin %}bg-warning-subtle text-warning{% else %}bg-primary-subtle text-primary{% endif %}">
+                  {{ u.role|capitalize }}
+                </span>
+              </td>
+              <td>
+                {% if u.target_career %}
+                  <span class="text-info small fw-semibold">{{ u.target_career.title }}</span>
+                {% else %}
+                  <span class="text-muted small">Not set</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-secondary-subtle text-secondary">{{ u.user_skills|length }}</span>
+              </td>
+              <td class="text-muted small">{{ u.created_at.strftime('%b %d, %Y') if u.created_at else 'Recent' }}</td>
+              <td class="text-end">
+                <!-- Toggle Admin Role -->
+                {% if current_user.id != u.id %}
+                  <form action="{{ url_for('admin.toggle_user_role', user_id=u.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-link text-warning p-0 me-3" title="Toggle Admin Role">
+                      <i class="fa-solid fa-user-shield"></i> {% if u.is_admin %}Make Student{% else %}Promote Admin{% endif %}
+                    </button>
+                  </form>
+                  <form action="{{ url_for('admin.user_delete', user_id=u.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete user {{ u.full_name }}?');">
+                    <button type="submit" class="btn btn-sm btn-link text-danger p-0" title="Delete User">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </form>
+                {% else %}
+                  <span class="badge bg-secondary-subtle text-secondary">Current Session</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

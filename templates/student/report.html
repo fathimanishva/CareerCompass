@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Career Assessment Report - {{ user.full_name }} - CareerCompass{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Print Controls -->
+  <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+    <a href="{{ url_for('student.dashboard') }}" class="btn btn-glass">
+      <i class="fa-solid fa-arrow-left me-1"></i> Back to Dashboard
+    </a>
+    <button onclick="window.print()" class="btn btn-primary-grad shadow">
+      <i class="fa-solid fa-print me-2"></i> Print / Save as PDF
+    </button>
+  </div>
+
+  <!-- Report Document Paper -->
+  <div class="glass-card p-4 p-md-5 mx-auto" style="max-width: 900px; background: var(--bg-card-solid);">
+    <!-- Report Header -->
+    <div class="d-flex justify-content-between align-items-start border-bottom border-secondary border-opacity-25 pb-4 mb-4">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <div class="bg-primary text-white rounded-3 p-2 d-inline-flex">
+            <i class="fa-solid fa-compass"></i>
+          </div>
+          <h4 class="fw-bold mb-0">Career<span class="text-primary">Compass</span></h4>
+        </div>
+        <div class="text-muted small">AI-Assisted Skill Gap Analysis & Career Guidance System</div>
+      </div>
+      <div class="text-end">
+        <div class="badge bg-primary-subtle text-primary mb-1">Official Career Assessment</div>
+        <div class="text-muted small">Generated: {{ generated_at }}</div>
+      </div>
+    </div>
+
+    <!-- Student & Target Career Meta -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-6">
+        <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-10">
+          <div class="text-muted small">Student Name:</div>
+          <div class="fw-bold fs-5">{{ user.full_name }}</div>
+          <div class="text-muted small">{{ user.email }} &bull; {{ user.education or 'Self-Taught / Developer' }}</div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-10">
+          <div class="text-muted small">Target Career Goal:</div>
+          <div class="fw-bold fs-5 text-primary">{{ career.title }}</div>
+          <div class="text-muted small">{{ career.category }} &bull; {{ career.average_salary }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Match Evaluation Metrics -->
+    <div class="p-4 rounded-4 bg-primary-light border border-primary border-opacity-25 mb-4 text-center">
+      <div class="row align-items-center">
+        <div class="col-md-4 mb-3 mb-md-0 border-end border-primary border-opacity-25">
+          <div class="text-muted small">Readiness Match</div>
+          <div class="display-5 fw-bold text-primary">{{ analysis.match_score }}%</div>
+        </div>
+        <div class="col-md-4 mb-3 mb-md-0 border-end border-primary border-opacity-25">
+          <div class="text-muted small">Status</div>
+          <div class="fw-bold text-success fs-6 mt-1">{{ analysis.readiness_level }}</div>
+        </div>
+        <div class="col-md-4">
+          <div class="text-muted small">Estimated Roadmap Time</div>
+          <div class="fw-bold fs-6 mt-1">{{ analysis.time_estimate }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills Breakdown -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-6">
+        <h6 class="fw-bold text-success mb-2"><i class="fa-solid fa-check-circle me-1"></i> Verified Acquired Skills ({{ analysis.matched_skills|length }})</h6>
+        <div class="d-flex flex-wrap gap-1">
+          {% for ms in analysis.matched_skills %}
+            <span class="skill-tag badge-matched" style="font-size: 0.8rem;">{{ ms.skill.name }} ({{ ms.user_proficiency }})</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <h6 class="fw-bold text-danger mb-2"><i class="fa-solid fa-triangle-exclamation me-1"></i> Missing Critical Skills ({{ analysis.missing_critical_skills|length }})</h6>
+        <div class="d-flex flex-wrap gap-1">
+          {% for ms in analysis.missing_critical_skills %}
+            <span class="skill-tag badge-critical" style="font-size: 0.8rem;">{{ ms.skill.name }}</span>
+          {% endfor %}
+          {% if analysis.missing_critical_skills|length == 0 %}
+            <span class="text-muted small">None (All critical skills satisfied)</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Phased Roadmap Plan -->
+    <div class="mb-4">
+      <h5 class="fw-bold mb-3 border-bottom border-secondary border-opacity-25 pb-2">
+        <i class="fa-solid fa-route text-primary me-2"></i> Phased Action Plan ({{ plan.estimated_weeks }} Weeks)
+      </h5>
+      <div class="d-flex flex-column gap-3">
+        {% for phase in plan.phases %}
+          <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-10">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <strong class="text-white">{{ phase.phase_title }}</strong>
+              <span class="badge bg-secondary-subtle text-secondary">{{ phase.duration }}</span>
+            </div>
+            <ul class="text-muted small mb-0 ps-3">
+              {% for m in phase.milestones %}
+                <li>{{ m }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Footer of Report -->
+    <div class="pt-4 border-top border-secondary border-opacity-25 text-center text-muted small">
+      <div>CareerCompass: AI-Assisted Skill Gap Analysis & Career Recommendation System</div>
+      <div>Designed & Developed by Fathima Nishva A (Roll No: 19)</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

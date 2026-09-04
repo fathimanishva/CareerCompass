@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}{{ career.title }} - Career Details - CareerCompass{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <!-- Career Header Banner -->
+  <div class="glass-card p-4 p-md-5 mb-5 position-relative">
+    <div class="row align-items-center g-4">
+      <div class="col-md-8">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <span class="badge bg-primary-subtle text-primary">{{ career.category }}</span>
+          <span class="badge bg-warning-subtle text-warning">{{ career.difficulty }}</span>
+          <span class="badge bg-success-subtle text-success"><i class="fa-solid fa-fire me-1"></i> {{ career.market_demand }} Demand</span>
+        </div>
+        <h1 class="fw-bold mb-3">{{ career.title }}</h1>
+        <p class="lead text-muted mb-4">{{ career.description }}</p>
+
+        <div class="d-flex flex-wrap gap-4 text-muted small">
+          <div><i class="fa-solid fa-money-bill-trend-up text-success fs-5 me-2"></i> <strong>Avg. Salary:</strong> {{ career.average_salary }}</div>
+          <div><i class="fa-solid fa-laptop-code text-primary fs-5 me-2"></i> <strong>Total Skills:</strong> {{ career.skill_requirements|length }}</div>
+        </div>
+      </div>
+
+      <div class="col-md-4 text-md-end">
+        {% if current_user.is_authenticated and not current_user.is_admin %}
+          <form action="{{ url_for('student.set_target_career', career_id=career.id) }}" method="POST">
+            <button type="submit" class="btn btn-primary-grad btn-lg w-100 py-3 shadow mb-2">
+              <i class="fa-solid fa-chart-radar me-2"></i> Set as My Goal & Analyze Gap
+            </button>
+          </form>
+          <a href="{{ url_for('student.roadmap', career_id=career.id) }}" class="btn btn-glass w-100 py-2">
+            <i class="fa-solid fa-route me-1"></i> Preview Phased Roadmap
+          </a>
+        {% elif not current_user.is_authenticated %}
+          <a href="{{ url_for('auth.register') }}" class="btn btn-primary-grad btn-lg w-100 py-3 shadow">
+            <i class="fa-solid fa-user-plus me-2"></i> Sign Up to Track This Path
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Required Skills Matrix -->
+    <div class="col-lg-8">
+      <div class="glass-card p-4 mb-4">
+        <h4 class="fw-bold mb-3"><i class="fa-solid fa-layer-group text-primary me-2"></i> Skill Requirements Matrix</h4>
+        <p class="text-muted small mb-4">Mastering these critical and recommended skills prepares you for top industry positions.</p>
+
+        <div class="table-responsive">
+          <table class="table table-dark table-hover align-middle">
+            <thead>
+              <tr class="text-muted small border-secondary border-opacity-25">
+                <th>Skill Name</th>
+                <th>Category</th>
+                <th>Importance</th>
+                <th>Target Proficiency</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for req in career.skill_requirements %}
+                <tr class="border-secondary border-opacity-10">
+                  <td class="fw-semibold">
+                    <i class="fa-solid fa-check-circle text-primary me-2"></i> {{ req.skill.name }}
+                  </td>
+                  <td><span class="badge bg-subtle text-muted">{{ req.skill.category }}</span></td>
+                  <td>
+                    <span class="badge {% if req.importance == 'Critical' %}badge-critical{% elif req.importance == 'Recommended' %}badge-recommended{% else %}badge-optional{% endif %}">
+                      {{ req.importance }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="text-muted small">{{ req.target_proficiency }}</span>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Guided Projects -->
+      {% if career.projects %}
+        <div class="glass-card p-4 mb-4">
+          <h4 class="fw-bold mb-3"><i class="fa-solid fa-laptop-code text-success me-2"></i> Recommended Portfolio Projects</h4>
+          <div class="row g-3">
+            {% for proj in career.projects %}
+              <div class="col-12">
+                <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h6 class="fw-bold mb-0 text-primary">{{ proj.title }}</h6>
+                    <span class="badge bg-warning-subtle text-warning">{{ proj.difficulty }}</span>
+                  </div>
+                  <p class="text-muted small mb-2">{{ proj.description }}</p>
+                  <div class="small text-muted"><i class="fa-solid fa-code me-1"></i> <strong>Tech Stack:</strong> {{ proj.tech_stack }}</div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Sidebar: Certifications & Learning Resources -->
+    <div class="col-lg-4">
+      <!-- Certifications -->
+      <div class="glass-card p-4 mb-4">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-award text-warning me-2"></i> Top Certifications</h5>
+        {% if career.certifications %}
+          <div class="d-flex flex-column gap-3">
+            {% for cert in career.certifications %}
+              <div class="p-3 rounded-3 bg-dark bg-opacity-50 border border-secondary border-opacity-25">
+                <div class="fw-bold small mb-1">{{ cert.name }}</div>
+                <div class="d-flex justify-content-between text-muted small">
+                  <span>{{ cert.issuer }}</span>
+                  <span class="badge bg-info-subtle text-info">{{ cert.cost_type }}</span>
+                </div>
+                {% if cert.url %}
+                  <a href="{{ cert.url }}" target="_blank" class="btn btn-sm btn-glass w-100 mt-2">
+                    <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> Exam Info
+                  </a>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted small">No specific certifications listed yet.</p>
+        {% endif %}
+      </div>
+
+      <!-- Quick Learning Links -->
+      <div class="glass-card p-4">
+        <h5 class="fw-bold mb-3"><i class="fa-solid fa-book-open text-info me-2"></i> Learning Resources</h5>
+        {% if career.resources %}
+          <div class="d-flex flex-column gap-2">
+            {% for res in career.resources %}
+              <a href="{{ res.url }}" target="_blank" class="p-2 rounded-2 bg-dark bg-opacity-25 border border-secondary border-opacity-10 text-decoration-none d-flex justify-content-between align-items-center text-muted hover-link">
+                <div class="text-truncate me-2 small">
+                  <i class="fa-solid fa-graduation-cap text-primary me-2"></i> {{ res.title }}
+                </div>
+                <i class="fa-solid fa-external-link small"></i>
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted small">Standard documentation and tutorials available in Learning Hub.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
