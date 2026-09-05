@@ -26,27 +26,31 @@ def check_student_access():
 def dashboard():
     user = current_user
     target_career = user.target_career
-    
+
+    # Temporarily skip expensive analysis on dashboard
     gap_analysis = None
-    if target_career:
-        gap_analysis = analyze_skill_gap(user, target_career)
-        
-    top_matches = find_top_career_matches(user, limit=4)
-    
-    # Active roadmap progress
+    top_matches = []
+
     roadmap_progress = None
     if target_career:
         roadmap_progress = UserRoadmapProgress.query.filter_by(
-            user_id=user.id, career_id=target_career.id
+            user_id=user.id,
+            career_id=target_career.id
         ).first()
-        
-    # Recent daily logs
-    recent_logs = DailyLog.query.filter_by(user_id=user.id).order_by(DailyLog.date.desc()).limit(5).all()
-    total_hours = sum([log.hours_spent for log in DailyLog.query.filter_by(user_id=user.id).all()])
-    
-    # User skills list
+
+    recent_logs = (
+        DailyLog.query
+        .filter_by(user_id=user.id)
+        .order_by(DailyLog.date.desc())
+        .limit(5)
+        .all()
+    )
+
+    all_logs = DailyLog.query.filter_by(user_id=user.id).all()
+    total_hours = sum(log.hours_spent for log in all_logs)
+
     user_skills = UserSkill.query.filter_by(user_id=user.id).all()
-    
+
     return render_template(
         'student/dashboard.html',
         user=user,
@@ -58,7 +62,6 @@ def dashboard():
         total_hours=total_hours,
         user_skills=user_skills
     )
-
 
 @student_bp.route('/skills', methods=['GET', 'POST'])
 def skill_profile():
