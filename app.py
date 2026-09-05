@@ -54,16 +54,12 @@ def create_app(config_class=Config, auto_seed=True):
 
     @app.errorhandler(500)
     def internal_error(error):
-        db.session.rollback()
         return render_template('500.html'), 500
 
-    # Auto-initialize and seed DB if requested and not in testing
     if auto_seed and not app.config.get('TESTING'):
         with app.app_context():
             db.create_all()
-           
 
-    # CLI command to reseed
     @app.cli.command('seed-db')
     def seed_db_command():
         seed_database(app)
@@ -72,10 +68,11 @@ def create_app(config_class=Config, auto_seed=True):
     return app
 
 
-app = create_app()
-with app.app_context():
-    db.create_all()
-    seed_database(app)
+app = create_app(auto_seed=False)
 
 if __name__ == '__main__':
+    with app.app_context():
+        db.create_all()
+        seed_database(app)
+
     app.run(debug=True, port=5000)
