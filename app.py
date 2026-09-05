@@ -61,7 +61,7 @@ def create_app(config_class=Config, auto_seed=True):
     if auto_seed and not app.config.get('TESTING'):
         with app.app_context():
             db.create_all()
-            seed_database(app)
+           
 
     # CLI command to reseed
     @app.cli.command('seed-db')
@@ -73,6 +73,9 @@ def create_app(config_class=Config, auto_seed=True):
 
 
 app = create_app()
+with app.app_context():
+    db.create_all()
+    seed_database(app)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
