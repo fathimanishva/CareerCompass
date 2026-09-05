@@ -33,13 +33,13 @@ def analyze_skill_gap(user, career_role):
     """
     # Build dictionary of user skills: {skill_id: UserSkill}
     user_skills = UserSkill.query.filter_by(
-            user_id=user.id
-        ).all()
+        user_id=user.id
+    ).all()
 
-        user_skill_map = {
-            us.skill_id: us
-            for us in user_skills
-        }
+    user_skill_map = {
+    us.skill_id: us
+        for us in user_skills
+    }
     
     requirements = CareerSkillRequirement.query.filter_by(career_id=career_role.id).all()
     
