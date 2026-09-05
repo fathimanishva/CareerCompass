@@ -32,7 +32,14 @@ def analyze_skill_gap(user, career_role):
     }
     """
     # Build dictionary of user skills: {skill_id: UserSkill}
-    user_skill_map = {us.skill_id: us for us in user.user_skills}
+    user_skills = UserSkill.query.filter_by(
+            user_id=user.id
+        ).all()
+
+        user_skill_map = {
+            us.skill_id: us
+            for us in user_skills
+        }
     
     requirements = CareerSkillRequirement.query.filter_by(career_id=career_role.id).all()
     
@@ -134,24 +141,109 @@ def analyze_skill_gap(user, career_role):
 
 def find_top_career_matches(user, limit=5):
     """
-    Ranks all career paths for the user based on compatibility match score.
+    Efficiently ranks all career paths for the user.
     """
+
+    # Load once
     all_careers = CareerRole.query.all()
+    user_skills = UserSkill.query.filter_by(user_id=user.id).all()
+
+    user_skill_map = {
+        us.skill_id: us for us in user_skills
+    }
+
+    # Load all requirements once
+    all_requirements = CareerSkillRequirement.query.all()
+
+    # Group requirements by career
+    requirements_by_career = {}
+
+    for req in all_requirements:
+        requirements_by_career.setdefault(
+            req.career_id, []
+        ).append(req)
+
     rankings = []
-    
+
     for career in all_careers:
-        analysis = analyze_skill_gap(user, career)
+
+        requirements = requirements_by_career.get(
+            career.id, []
+        )
+
+        total_possible_weight = 0
+        earned_weight = 0
+
+        matched_skills = []
+        missing_critical_count = 0
+
+        for req in requirements:
+
+            weight = IMPORTANCE_WEIGHTS.get(
+                req.importance, 2
+            )
+
+            total_possible_weight += weight
+
+            if req.skill_id in user_skill_map:
+
+                us = user_skill_map[req.skill_id]
+
+                prof_mult = PROFICIENCY_SCORES.get(
+                    us.proficiency, 0.7
+                )
+
+                earned_weight += weight * prof_mult
+
+                matched_skills.append({
+                    'skill': req.skill,
+                    'user_proficiency': us.proficiency,
+                    'target_proficiency': req.target_proficiency,
+                    'importance': req.importance,
+                    'score_pct': int(prof_mult * 100)
+                })
+
+            elif req.importance == 'Critical':
+                missing_critical_count += 1
+
+        if total_possible_weight > 0:
+            match_score = round(
+                (earned_weight / total_possible_weight) * 100,
+                1
+            )
+        else:
+            match_score = 0.0
+
+        if match_score >= 80:
+            readiness_level = "Job Ready / Advanced Match"
+            readiness_badge = "success"
+
+        elif match_score >= 55:
+            readiness_level = "Moderate Gap (Solid Foundation)"
+            readiness_badge = "primary"
+
+        elif match_score >= 30:
+            readiness_level = "Developing Skills"
+            readiness_badge = "warning"
+
+        else:
+            readiness_level = "Early Stage / Foundational"
+            readiness_badge = "danger"
+
         rankings.append({
             'career': career,
-            'match_score': analysis['match_score'],
-            'readiness_level': analysis['readiness_level'],
-            'readiness_badge': analysis['readiness_badge'],
-            'acquired_count': analysis['acquired_count'],
-            'total_required_count': analysis['total_required_count'],
-            'missing_critical_count': len(analysis['missing_critical_skills']),
-            'matched_skills': analysis['matched_skills']
+            'match_score': match_score,
+            'readiness_level': readiness_level,
+            'readiness_badge': readiness_badge,
+            'acquired_count': len(matched_skills),
+            'total_required_count': len(requirements),
+            'missing_critical_count': missing_critical_count,
+            'matched_skills': matched_skills
         })
-        
-    # Sort descending by match score
-    rankings.sort(key=lambda x: x['match_score'], reverse=True)
+
+    rankings.sort(
+        key=lambda x: x['match_score'],
+        reverse=True
+    )
+
     return rankings[:limit]
